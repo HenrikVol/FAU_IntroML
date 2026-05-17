@@ -15,7 +15,6 @@ def compute_histogram(image: np.ndarray) -> np.ndarray:
     """Compute a grayscale histogram with 256 bins."""
     # ToDo: Implement actual histogram calculation.
     histogram = np.zeros(0)
-    # Done
     histogram, _ = np.histogram(image, bins=256, range=(0, 256))
     return histogram
 
@@ -23,7 +22,6 @@ def compute_histogram(image: np.ndarray) -> np.ndarray:
 def p_helper(prob: np.ndarray, theta: int) -> tuple[float, float]:
     """Compute class probabilities p0 and p1 for threshold theta."""
     # ToDo: Implement actual probability computation.
-    # Done
     p0 = np.sum(prob[:theta + 1]) # Sum of all values below theta
     p1 = np.sum(prob[theta + 1:]) # Sum of all values above theta
     return p0, p1
@@ -33,8 +31,8 @@ def mu_helper(prob: np.ndarray, theta: int, p0: float, p1: float) -> tuple[float
     """Compute class means mu0 and mu1 for threshold theta."""
     # ToDo: Implement actual mean computation.
     img_indices = np.arange(len(prob))
-    mu0 = np.sum(prob[:theta + 1] * img_indices[:theta + 1]) / p0  # In otsu_threshold it is checked that p0 and p1 are not zero
-    mu1 = np.sum(prob[theta + 1:] * img_indices[theta + 1:]) / p1  # In otsu_threshold it is checked that p0 and p1 are not zero
+    mu0 = np.sum(prob[:theta + 1] * img_indices[:theta + 1]) / p0 
+    mu1 = np.sum(prob[theta + 1:] * img_indices[theta + 1:]) / p1
     return mu0, mu1
 
 
@@ -44,7 +42,7 @@ def otsu_threshold(histogram: np.ndarray) -> int:
 
     # Histogram normalization
     total_pixels = np.sum(histogram)
-    # A normalized histogram only contains the probabilities for each gray value, not of the absolute occurrences.
+    # A normalized histogram only contains the probabilities of each gray-value, not of the absolute occurrences
     prob = histogram.astype(np.float64) / total_pixels
     
     max_variance = 0.0
@@ -56,7 +54,7 @@ def otsu_threshold(histogram: np.ndarray) -> int:
             continue  # skip invalid splits
 
         mu0, mu1 = mu_helper(prob, theta, p0, p1)
-        variance = p0 * p1 * (mu1 - mu0) ** 2 # compute between-class variance
+        variance = p0 * p1 * (mu1 - mu0) ** 2
         if variance > max_variance:
             max_variance = variance
             best_threshold = theta
