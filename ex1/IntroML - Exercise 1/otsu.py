@@ -15,39 +15,61 @@ def compute_histogram(image: np.ndarray) -> np.ndarray:
     """Compute a grayscale histogram with 256 bins."""
     # ToDo: Implement actual histogram calculation.
     histogram = np.zeros(0)
+    # Done
+    histogram, _ = np.histogram(image, bins=256, range=(0, 256))
     return histogram
 
 
 def p_helper(prob: np.ndarray, theta: int) -> tuple[float, float]:
     """Compute class probabilities p0 and p1 for threshold theta."""
     # ToDo: Implement actual probability computation.
-    p0 = 0.0
-    p1 = 0.0
+    # Done
+    p0 = np.sum(prob[:theta + 1]) # Sum of all values below theta
+    p1 = np.sum(prob[theta + 1:]) # Sum of all values above theta
     return p0, p1
 
 
 def mu_helper(prob: np.ndarray, theta: int, p0: float, p1: float) -> tuple[float, float]:
     """Compute class means mu0 and mu1 for threshold theta."""
     # ToDo: Implement actual mean computation.
-    mu0 = 0.0
-    mu1 = 0.0
+    img_indices = np.arange(256)
+    mu0 = np.sum(prob[:theta + 1] * img_indices[:theta + 1]) / p0  # In otsu_threshold it is checked that p0 and p1 are not zero
+    mu1 = np.sum(prob[theta + 1:] * img_indices[theta + 1:]) / p1  # In otsu_threshold it is checked that p0 and p1 are not zero
     return mu0, mu1
 
 
 def otsu_threshold(histogram: np.ndarray) -> int:
     """Compute Otsu's threshold from a histogram."""
     # ToDo: Implement full Otsu algorithm.
-    prob = histogram.astype(np.float64)  # later normalize
+
+    # Histogram normalization
+    total_pixels = np.sum(histogram)
+    # A normalized histogram only contains the probabilities for each gray value, not of the absolute occurrences.
+    prob = histogram.astype(np.float64) / total_pixels
+    
     max_variance = 0.0
     best_threshold = 0
+
+    for theta in range(256):
+        p0, p1 = p_helper(prob, theta)
+        if p0 == 0 or p1 == 0:
+            continue  # skip invalid splits
+
+        mu0, mu1 = mu_helper(prob, theta, p0, p1)
+        variance = p0 * p1 * (mu1 - mu0) ** 2 # compute between-class variance
+        if variance > max_variance:
+            max_variance = variance
+            best_threshold = theta
+    
     return int(best_threshold)
 
 
 def otsu_binarize(image: np.ndarray) -> tuple[np.ndarray, int]:
     """Binarize an image using Otsu's threshold."""
     # ToDo: Combine the helper functions to produce the binarized image.
-    theta = 0
-    binarized = np.zeros(0)
+    histogram = compute_histogram(image)
+    theta = otsu_threshold(histogram)
+    binarized = binarize_threshold(image, theta)
     return binarized, theta
 
 
