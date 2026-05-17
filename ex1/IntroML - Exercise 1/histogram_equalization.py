@@ -16,21 +16,59 @@ def compute_histogram(image: np.ndarray) -> np.ndarray:
     # ToDo: Create a histogram for the given image (256 values).
     # ToDo: Don't use functions like np.histogram.
     # ToDo: It is easier if you flatten your image first.
-    histogram = np.zeros(0)
-    return histogram
+    histogram = np.zeros(256, dtype=np.int64)
+    flattened_image = image.flatten()
 
+    for pixel in flattened_image:
+        histogram[pixel] += 1
+    return histogram
+    
 
 def compute_cdf(histogram: np.ndarray) -> np.ndarray:
     # ToDo: Compute the CDF.
     # ToDo: Don't forget to normalize it (turn it into a distribution).
-    cdf = np.zeros(0)
+    cdf = np.zeros(256, dtype=np.float64)
+
+    total_pixels = 0
+    for number_of_pixels_with_intensity in histogram:
+        total_pixels += number_of_pixels_with_intensity
+
+    cumulative_pixel_count = 0
+    for i in range(256):
+        cumulative_pixel_count += histogram[i]
+        cdf[i] = cumulative_pixel_count / total_pixels
     return cdf
 
 
 def equalize_image(image: np.ndarray, cdf: np.ndarray) -> np.ndarray:
     # ToDo: Apply histogram equalization to the given image.
     # ToDo: Hint: Flatten the image first and reshape it again in the end.
-    equalized_image = np.zeros(0)
+    flattened_image = image.flatten()
+    equalized_flattened_image = np.zeros_like(flattened_image, dtype=np.uint8)
+
+    # The maximum gray value for an 8-bit grayscale image is 255.
+    number_of_intensity_values = 255
+
+    # Find C_min: the first non-zero value in the CDF.
+    cdf_min = 0.0
+    for cdf_value in cdf:
+        if cdf_value > 0:
+            cdf_min = cdf_value
+            break
+
+    # Apply the histogram equalization formula to every pixel.
+    for pixel_index in range(len(flattened_image)):
+        old_pixel_value = flattened_image[pixel_index]
+        
+        # new_pixel = floor(((C(old_pixel) - C_min) / (1 - C_min)) * 255)
+        new_pixel_value = np.floor(
+            ((cdf[old_pixel_value] - cdf_min) / (1 - cdf_min))
+            * number_of_intensity_values
+        )
+
+        equalized_flattened_image[pixel_index] = np.uint8(new_pixel_value)
+
+    equalized_image = equalized_flattened_image.reshape(image.shape)
     return equalized_image
 
 
