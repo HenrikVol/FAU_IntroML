@@ -32,7 +32,7 @@ def p_helper(prob: np.ndarray, theta: int) -> tuple[float, float]:
 def mu_helper(prob: np.ndarray, theta: int, p0: float, p1: float) -> tuple[float, float]:
     """Compute class means mu0 and mu1 for threshold theta."""
     # ToDo: Implement actual mean computation.
-    img_indices = np.arange(256)
+    img_indices = np.arange(len(prob))
     mu0 = np.sum(prob[:theta + 1] * img_indices[:theta + 1]) / p0  # In otsu_threshold it is checked that p0 and p1 are not zero
     mu1 = np.sum(prob[theta + 1:] * img_indices[theta + 1:]) / p1  # In otsu_threshold it is checked that p0 and p1 are not zero
     return mu0, mu1
