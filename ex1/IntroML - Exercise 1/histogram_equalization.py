@@ -46,17 +46,17 @@ def equalize_image(image: np.ndarray, cdf: np.ndarray) -> np.ndarray:
     flattened_image = image.flatten()
     equalized_flattened_image = np.zeros_like(flattened_image, dtype=np.uint8)
 
-    # The maximum gray value for an 8-bit grayscale image is 255.
+    # The maximum gray value for an 8-bit grayscale image is 255
     number_of_intensity_values = 255
 
-    # Find C_min: the first non-zero value in the CDF.
+    # Find C_min: the first non-zero value in the CDF
     cdf_min = 0.0
     for cdf_value in cdf:
         if cdf_value > 0:
             cdf_min = cdf_value
             break
 
-    # Apply the histogram equalization formula to every pixel.
+    # Apply the histogram equalization formula to every pixel
     for pixel_index in range(len(flattened_image)):
         old_pixel_value = flattened_image[pixel_index]
         
