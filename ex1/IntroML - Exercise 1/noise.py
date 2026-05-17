@@ -52,7 +52,7 @@ def add_poisson_noise(image: np.ndarray) -> np.ndarray:
     
     # Generate Poisson-distributed pixel values, Keep values in the valid image range and convert back to uint8.
     noisy_image = np.random.poisson(image.astype(np.float32))
-    noisy_image = np.clip(noise, 0, 255).astype(np.uint8)
+    noisy_image = np.clip(noisy_image, 0, 255).astype(np.uint8)
     return noisy_image
 
 
